@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { RotateCcw, Send, Check } from 'lucide-react';
 import { HoverSparklesAiIcon } from '../icons/itshover-animated-icons';
@@ -40,19 +40,19 @@ const SCENARIOS = [
   },
   {
     id: 'buynow',
-    tabLabel: '3. Mua Ngay (Buy Now)',
-    query: 'Mua ngay Patek Nautilus giá 420.000.000 ₫',
-    aiReply: 'Xác nhận giao dịch Mua Ngay! Toàn bộ bộ đếm phiên được hủy lập tức và kích hoạt Lô #02.',
-    benefitEyebrow: 'Ưu tiên giao dịch tức thì',
-    benefitTitle: 'Khóa sở hữu không qua đấu giá',
+    tabLabel: '3. Giá Chốt (Tùy chọn)',
+    query: 'Chốt giá Patek Nautilus ở mức 420.000.000 ₫',
+    aiReply: 'Xác nhận Chốt Giá thành công! Toàn bộ bộ đếm phiên được hủy lập tức và kích hoạt Lô #02.',
+    benefitEyebrow: 'Ưu tiên chốt sở hữu tức thì',
+    benefitTitle: 'Khớp Giá chốt không cần chờ',
     ctaLabel: 'Hoàn tất bàn giao lô',
     routeFrom: 'Trạng thái BIDDING',
-    routeTo: 'SOLD (BUY NOW)',
+    routeTo: 'CHỐT GIÁ (SOLD)',
     line1Label: 'Chủ sở hữu mới',
     line1Value: 'Lê Hoàng Yến',
     line2Label: 'Lô kế tiếp mở sàn',
     line2Value: 'Rolex 116500LN',
-    bannerLabel: 'Mua ngay thành công',
+    bannerLabel: 'Chốt giá ngay thành công',
     bannerAmt: '420.000.000 ₫',
   },
 ];
@@ -64,6 +64,8 @@ const BUBBLE_EASE = [0.22, 1.15, 0.36, 1];
  * and Prompt-Motion's state-machine motion reel.
  */
 export function SerkoAuctionAgentShowcase() {
+  const containerRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(true);
   const [scenarioIdx, setScenarioIdx] = useState(0);
   const [phase, setPhase] = useState('typing'); // typing | user | ai | benefit | result
   const [typedText, setTypedText] = useState('');
@@ -72,6 +74,18 @@ export function SerkoAuctionAgentShowcase() {
   const scenario = SCENARIOS[scenarioIdx];
 
   useEffect(() => {
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return undefined;
+    const obs = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return undefined;
     let cancelled = false;
     const timers = [];
 
@@ -83,10 +97,10 @@ export function SerkoAuctionAgentShowcase() {
 
     function stepType() {
       if (cancelled) return;
-      i += 1;
+      i = Math.min(full.length, i + 2);
       setTypedText(full.slice(0, i));
       if (i < full.length) {
-        timers.push(setTimeout(stepType, 26));
+        timers.push(setTimeout(stepType, 42));
       } else {
         timers.push(setTimeout(() => !cancelled && setPhase('user'), 450));
         timers.push(setTimeout(() => !cancelled && setPhase('ai'), 1150));
@@ -108,7 +122,7 @@ export function SerkoAuctionAgentShowcase() {
       cancelled = true;
       timers.forEach(clearTimeout);
     };
-  }, [scenarioIdx, runKey, scenario.query]);
+  }, [isVisible, scenarioIdx, runKey, scenario.query]);
 
   function selectScenario(idx) {
     setScenarioIdx(idx);
@@ -116,7 +130,7 @@ export function SerkoAuctionAgentShowcase() {
   }
 
   return (
-    <div className="serko-visual-frame rounded-[2rem] p-5 sm:p-8 flex flex-col items-center justify-center relative overflow-hidden">
+    <div ref={containerRef} className="serko-visual-frame rounded-[2rem] p-5 sm:p-8 flex flex-col items-center justify-center relative overflow-hidden">
       {/* Interactive Scenario Selector Pills (Prompt-Motion style) */}
       <div className="w-full max-w-[420px] flex flex-wrap items-center justify-between gap-1.5 mb-4">
         <div className="flex flex-wrap gap-1.5">

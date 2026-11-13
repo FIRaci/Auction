@@ -51,7 +51,7 @@ model Item {
   category     String    @default("Art & Collectibles")
   imageUrl     String?
   startingPrice Float
-  buyNowPrice  Float
+  buyNowPrice  Float?
   currentPrice Float
   minIncrement Float     @default(10000)
   status       String    @default("WAITING") // "WAITING", "BIDDING", "SOLD", "UNSOLD"

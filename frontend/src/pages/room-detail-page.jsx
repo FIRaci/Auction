@@ -196,7 +196,7 @@ export function RoomDetailPage({
         type: 'success',
         message:
           payload?.message ||
-          `Vật phẩm đã được mua ngay bởi ${payload?.buyer?.fullName || 'thành viên'}!`,
+          `Vật phẩm đã được chốt giá bởi ${payload?.buyer?.fullName || 'thành viên'}!`,
       });
       fetchRoomDetails();
     };
@@ -345,7 +345,7 @@ export function RoomDetailPage({
     socket.emit('buy_now', { roomId }, (res) => {
       setBuyingNow(false);
       if (!res?.success) {
-        setFeedback({ type: 'error', message: res?.message || 'Không thể thực hiện Mua ngay.' });
+        setFeedback({ type: 'error', message: res?.message || 'Không thể thực hiện Chốt giá.' });
       }
     });
   };

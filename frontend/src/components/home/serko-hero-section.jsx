@@ -88,7 +88,7 @@ export function SerkoHeroSection({ activeLiveRoom, spotItem, onEnterRoom, onNavi
           className="mt-14 sm:mt-20 pb-12 max-w-4xl mx-auto"
         >
           {/* Card 1: Top Choice Pill (.hero1_profile_choice_wrap) */}
-          <div className="bg-white/95 backdrop-blur-md rounded-2xl px-4 py-3 border border-black/[0.06] shadow-serko-card flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div className="bg-white rounded-2xl px-4 py-3 border border-black/[0.06] shadow-serko-card flex flex-wrap items-center justify-between gap-3 mb-4">
             <div className="flex flex-wrap items-center gap-2.5 text-xs sm:text-sm font-medium text-[#17181c]">
               <span className="w-6 h-6 rounded-full bg-[#e2f8ea] text-[#1b9e52] flex items-center justify-center shrink-0">
                 <Check className="w-3.5 h-3.5" strokeWidth={2.5} />
@@ -122,7 +122,7 @@ export function SerkoHeroSection({ activeLiveRoom, spotItem, onEnterRoom, onNavi
           {/* 3-Card Bento Cluster */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
             {/* Collector Profile Card (.hero1_profile_item) */}
-            <div className="md:col-span-4 bg-[#f6f6f6]/95 backdrop-blur-md rounded-[20px] p-4 border border-black/[0.06] shadow-serko-card flex flex-col justify-between">
+            <div className="md:col-span-4 bg-[#f6f6f6] rounded-[20px] p-4 border border-black/[0.06] shadow-serko-card flex flex-col justify-between">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <img
@@ -154,7 +154,7 @@ export function SerkoHeroSection({ activeLiveRoom, spotItem, onEnterRoom, onNavi
             </div>
 
             {/* Live Bid Telemetry Card (.hero1_profile_route_wrap) */}
-            <div className="md:col-span-4 bg-white/95 backdrop-blur-md rounded-[20px] p-4 border border-black/[0.06] shadow-serko-card flex flex-col justify-between">
+            <div className="md:col-span-4 bg-white rounded-[20px] p-4 border border-black/[0.06] shadow-serko-card flex flex-col justify-between">
               <div className="flex items-center justify-between text-xs text-[#4b4f57]">
                 <span className="font-mono font-semibold text-[#17181c]">
                   LÔ #{displayItem?.queueOrder || 1} / {activeLiveRoom?.totalItems || 4}
@@ -180,7 +180,7 @@ export function SerkoHeroSection({ activeLiveRoom, spotItem, onEnterRoom, onNavi
             </div>
 
             {/* Featured Product & Instant Entry Card (.hero1_profile_hotel_wrap) */}
-            <div className="md:col-span-4 bg-white/95 backdrop-blur-md rounded-[20px] p-4 border border-black/[0.06] shadow-serko-card flex flex-col justify-between group">
+            <div className="md:col-span-4 bg-white rounded-[20px] p-4 border border-black/[0.06] shadow-serko-card flex flex-col justify-between group">
               <div className="flex items-start gap-3">
                 <div className="w-16 h-16 rounded-2xl overflow-hidden shrink-0 border border-[#e9e9ec]">
                   <ProductImageViewer
@@ -203,10 +203,14 @@ export function SerkoHeroSection({ activeLiveRoom, spotItem, onEnterRoom, onNavi
                 <div>
                   <div className="text-[10px] font-semibold tracking-[0.05em] uppercase text-[#8a8d96] flex items-center gap-1">
                     <HoverBoltZapIcon className="w-3 h-3 text-[#ff635c]" />
-                    <span>Mua ngay</span>
+                    <span>Giá chốt</span>
                   </div>
                   <div className="text-xs font-mono font-bold text-[#17181c]">
-                    {formatVND(buyNowPrice)}
+                    {displayItem?.buyNowPrice > 0
+                      ? formatVND(displayItem.buyNowPrice)
+                      : displayItem
+                        ? 'Tùy chọn'
+                        : formatVND(buyNowPrice)}
                   </div>
                 </div>
                 {activeLiveRoom && (

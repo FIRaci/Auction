@@ -36,9 +36,13 @@ export function SerkoGlobeCanvas({ className = '' }) {
 
     let animId = null;
     let rotation = 0.85;
+    let isInView = true;
+    let isTabVisible = typeof document !== 'undefined' ? !document.hidden : true;
+    let width = 0;
+    let height = 0;
 
-    // Precompute Fibonacci sphere dots
-    const dotCount = 520;
+    // Precompute Fibonacci sphere dots (adaptive for mobile vs desktop)
+    const dotCount = typeof window !== 'undefined' && window.innerWidth < 768 ? 160 : 300;
     const dots = [];
     const goldenRatio = (1 + Math.sqrt(5)) / 2;
     for (let i = 0; i < dotCount; i++) {
@@ -51,6 +55,15 @@ export function SerkoGlobeCanvas({ className = '' }) {
       });
     }
 
+    const tilt = -0.24;
+    const cosTilt = Math.cos(tilt);
+    const sinTilt = Math.sin(tilt);
+    const DOT_FILL_BUCKETS = [
+      'rgba(0, 28, 56, 0.14)',
+      'rgba(0, 28, 56, 0.26)',
+      'rgba(0, 28, 56, 0.38)',
+    ];
+
     function project(lat, lon, rot, radius, cx, cy) {
       const phi = degToRad(90 - lat);
       const theta = degToRad(lon) + rot;
@@ -58,10 +71,8 @@ export function SerkoGlobeCanvas({ className = '' }) {
       const y = Math.cos(phi);
       const z = Math.sin(phi) * Math.sin(theta);
 
-      // Slight downward tilt (-15 deg) like Serko globe
-      const tilt = -0.24;
-      const yTilt = y * Math.cos(tilt) - z * Math.sin(tilt);
-      const zTilt = y * Math.sin(tilt) + z * Math.cos(tilt);
+      const yTilt = y * cosTilt - z * sinTilt;
+      const zTilt = y * sinTilt + z * cosTilt;
 
       return {
         sx: cx + x * radius,
@@ -73,23 +84,28 @@ export function SerkoGlobeCanvas({ className = '' }) {
     function resize() {
       const parent = canvas.parentElement;
       if (!parent) return;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = parent.clientWidth;
-      const h = parent.clientHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      canvas.style.width = `${w}px`;
-      canvas.style.height = `${h}px`;
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      width = parent.clientWidth;
+      height = parent.clientHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
     resize();
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', resize, { passive: true });
 
     let tick = 0;
     function render() {
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
+      if (!isInView || !isTabVisible) {
+        animId = null;
+        return;
+      }
+
+      const w = width || canvas.clientWidth;
+      const h = height || canvas.clientHeight;
       ctx.clearRect(0, 0, w, h);
 
       const radius = Math.min(w * 0.44, h * 0.62, 340);
@@ -97,6 +113,9 @@ export function SerkoGlobeCanvas({ className = '' }) {
       const cy = h * 0.58;
       rotation += 0.0022;
       tick += 0.015;
+
+      const cosRot = Math.cos(rotation);
+      const sinRot = Math.sin(rotation);
 
       // Subtle atmospheric halo
       const halo = ctx.createRadialGradient(cx, cy, radius * 0.72, cx, cy, radius * 1.15);
@@ -108,22 +127,46 @@ export function SerkoGlobeCanvas({ className = '' }) {
       ctx.arc(cx, cy, radius * 1.15, 0, Math.PI * 2);
       ctx.fill();
 
-      // Render sphere dots
-      const tilt = -0.24;
+      // Batch sphere dots into 3 opacity buckets (3 fill calls instead of 300+)
+      const bucket0 = [];
+      const bucket1 = [];
+      const bucket2 = [];
+
       for (let i = 0; i < dots.length; i++) {
         const d = dots[i];
-        const rx = d.x * Math.cos(rotation) - d.z * Math.sin(rotation);
-        const rz = d.x * Math.sin(rotation) + d.z * Math.cos(rotation);
-        const ry = d.y * Math.cos(tilt) - rz * Math.sin(tilt);
-        const fz = d.y * Math.sin(tilt) + rz * Math.cos(tilt);
+        const rx = d.x * cosRot - d.z * sinRot;
+        const rz = d.x * sinRot + d.z * cosRot;
+        const ry = d.y * cosTilt - rz * sinTilt;
+        const fz = d.y * sinTilt + rz * cosTilt;
 
         if (fz > -0.25) {
-          const alpha = Math.max(0.08, (fz + 0.25) * 0.34);
-          ctx.fillStyle = `rgba(0, 28, 56, ${alpha.toFixed(3)})`;
-          ctx.beginPath();
-          ctx.arc(cx + rx * radius, cy - ry * radius, fz > 0.3 ? 1.5 : 1.05, 0, Math.PI * 2);
-          ctx.fill();
+          const sx = cx + rx * radius;
+          const sy = cy - ry * radius;
+          if (fz > 0.45) {
+            bucket2.push(sx, sy);
+          } else if (fz > 0.08) {
+            bucket1.push(sx, sy);
+          } else {
+            bucket0.push(sx, sy);
+          }
         }
+      }
+
+      const buckets = [bucket0, bucket1, bucket2];
+      const radii = [1.0, 1.25, 1.5];
+      for (let b = 0; b < 3; b++) {
+        const pts = buckets[b];
+        if (pts.length === 0) continue;
+        const r = radii[b];
+        ctx.fillStyle = DOT_FILL_BUCKETS[b];
+        ctx.beginPath();
+        for (let k = 0; k < pts.length; k += 2) {
+          const px = pts[k];
+          const py = pts[k + 1];
+          ctx.moveTo(px + r, py);
+          ctx.arc(px, py, r, 0, Math.PI * 2);
+        }
+        ctx.fill();
       }
 
       // Render auction hub arcs
@@ -132,10 +175,11 @@ export function SerkoGlobeCanvas({ className = '' }) {
         ...project(hub.lat, hub.lon, rotation, radius, cx, cy),
       }));
 
-      ARCS.forEach(([fromIdx, toIdx], idx) => {
+      for (let idx = 0; idx < ARCS.length; idx++) {
+        const [fromIdx, toIdx] = ARCS[idx];
         const a = projectedHubs[fromIdx];
         const b = projectedHubs[toIdx];
-        if (a.z < -0.1 && b.z < -0.1) return;
+        if (a.z < -0.1 && b.z < -0.1) continue;
 
         const midX = (a.sx + b.sx) / 2;
         const midY = (a.sy + b.sy) / 2 - radius * 0.26;
@@ -161,10 +205,11 @@ export function SerkoGlobeCanvas({ className = '' }) {
         ctx.beginPath();
         ctx.arc(px, py, 2.4, 0, Math.PI * 2);
         ctx.fill();
-      });
+      }
 
       // Render visible hubs
-      projectedHubs.forEach((hub) => {
+      for (let i = 0; i < projectedHubs.length; i++) {
+        const hub = projectedHubs[i];
         if (hub.z > 0.05) {
           ctx.fillStyle = '#17181c';
           ctx.beginPath();
@@ -177,15 +222,51 @@ export function SerkoGlobeCanvas({ className = '' }) {
           ctx.arc(hub.sx, hub.sy, 6.5, 0, Math.PI * 2);
           ctx.stroke();
         }
-      });
+      }
 
       animId = requestAnimationFrame(render);
     }
 
-    animId = requestAnimationFrame(render);
+    function ensureAnimating() {
+      if (isInView && isTabVisible && animId === null) {
+        animId = requestAnimationFrame(render);
+      }
+    }
+
+    let observer = null;
+    if (typeof IntersectionObserver !== 'undefined') {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          isInView = entry.isIntersecting;
+          if (isInView) {
+            ensureAnimating();
+          } else if (animId !== null) {
+            cancelAnimationFrame(animId);
+            animId = null;
+          }
+        },
+        { threshold: 0.02 }
+      );
+      observer.observe(canvas);
+    }
+
+    function handleVisibility() {
+      isTabVisible = !document.hidden;
+      if (isTabVisible) {
+        ensureAnimating();
+      } else if (animId !== null) {
+        cancelAnimationFrame(animId);
+        animId = null;
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    ensureAnimating();
 
     return () => {
-      if (animId) cancelAnimationFrame(animId);
+      if (animId !== null) cancelAnimationFrame(animId);
+      if (observer) observer.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('resize', resize);
     };
   }, []);

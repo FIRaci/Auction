@@ -14,7 +14,7 @@ function formatSeconds(sec) {
   return `${rem}s`;
 }
 
-export function ThreeCallCountdownBanner({
+export const ThreeCallCountdownBanner = React.memo(function ThreeCallCountdownBanner({
   callStage = 0,
   callDeadline = null,
   idleDeadline = null,
@@ -43,7 +43,8 @@ export function ThreeCallCountdownBanner({
     };
 
     update();
-    const id = setInterval(update, 200);
+    const intervalMs = callStage > 0 ? 250 : 1000;
+    const id = setInterval(update, intervalMs);
     return () => clearInterval(id);
   }, [activeDeadline, callStage]);
 
@@ -187,5 +188,5 @@ export function ThreeCallCountdownBanner({
       </div>
     </div>
   );
-}
+});
 

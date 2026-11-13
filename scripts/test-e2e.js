@@ -120,9 +120,9 @@ async function runTests() {
   await api(`/rooms/${testRoomId}/join`, 'POST', null, bidder2Token);
   console.log('✓ Xác nhận: Hệ thống thực thi nghiêm ngặt nguyên tắc chỉ ở 1 phòng tại 1 thời điểm');
 
-  // 5. Đăng bán vật phẩm vào phòng theo hàng đợi FIFO
-  console.log('\n--- BƯỚC 4: ĐĂNG BÁN VẬT PHẨM (THÔNG TIN, GIÁ KHỞI ĐIỂM, GIÁ BÁN NGAY, FIFO) ---');
-  // Lô 1: Đấu giá
+  // 5. Đăng bán vật phẩm vào phòng theo hàng đợi FIFO (test Giá chốt optional ở Lô 01)
+  console.log('\n--- BƯỚC 4: ĐĂNG BÁN VẬT PHẨM (THÔNG TIN, GIÁ KHỞI ĐIỂM, GIÁ CHỐT TÙY CHỌN, FIFO) ---');
+  // Lô 1: Đấu giá không đặt Giá chốt (optional = null)
   const item1Res = await api('/items', 'POST', {
     roomId: testRoomId,
     title: 'Lô Test 01: Omega Speedmaster Moonwatch Professional',
@@ -130,10 +130,12 @@ async function runTests() {
     category: 'Đồng Hồ Thụy Sĩ',
     imageUrl: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&w=1200&q=85',
     startingPrice: 10000000, // 10 triệu
-    buyNowPrice: 25000000,   // 25 triệu
     minIncrement: 10000,     // Bước giá 10k
   }, bidder1Token);
-  assert(item1Res.status === 201 && item1Res.data.data.queueOrder === 1, 'Đăng bán Lô 01 thành công, xếp ở vị trí FIFO #1');
+  assert(
+    item1Res.status === 201 && item1Res.data.data.queueOrder === 1 && item1Res.data.data.buyNowPrice === null,
+    'Đăng bán Lô 01 (bỏ trống Giá chốt tùy chọn) thành công, xếp ở vị trí FIFO #1'
+  );
   activeItemId = item1Res.data.data.id;
 
   // Lô 2: Sẽ test Mua Ngay

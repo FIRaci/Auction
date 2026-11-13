@@ -424,7 +424,7 @@ class AuctionEngine {
   }
 
   /**
-   * Mua ngay vật phẩm không qua đấu giá (Buy Now)
+   * Chốt giá ngay theo Giá chốt (Buy Now)
    */
   async buyNow(roomId, userId) {
     const state = this.getRoomState(roomId);
@@ -433,11 +433,15 @@ class AuctionEngine {
     });
 
     if (!item || item.status !== 'BIDDING') {
-      return { success: false, message: 'Vật phẩm không khả dụng để mua ngay' };
+      return { success: false, message: 'Vật phẩm không khả dụng để chốt giá' };
+    }
+
+    if (!item.buyNowPrice || item.buyNowPrice <= 0) {
+      return { success: false, message: 'Vật phẩm này không áp dụng Giá chốt' };
     }
 
     if (item.sellerId === userId) {
-      return { success: false, message: 'Người bán không thể tự mua ngay vật phẩm của chính mình' };
+      return { success: false, message: 'Người bán không thể tự chốt giá vật phẩm của chính mình' };
     }
 
     const buyer = await prisma.user.findUnique({
@@ -464,7 +468,7 @@ class AuctionEngine {
       },
     });
 
-    const message = `Xác nhận giao dịch Mua Ngay! ${buyer.fullName} đã mua đứt lô "${item.title}" với giá niêm yết ${item.buyNowPrice.toLocaleString('vi-VN')} VNĐ.`;
+    const message = `Xác nhận Chốt Giá! ${buyer.fullName} đã chốt sở hữu lô "${item.title}" ở mức Giá chốt ${item.buyNowPrice.toLocaleString('vi-VN')} VNĐ.`;
 
     await prisma.auctionEventLog.create({
       data: {

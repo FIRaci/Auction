@@ -200,12 +200,12 @@ io.on('connection', (socket) => {
   });
 
   /**
-   * Mua ngay vật phẩm (Buy Now)
+   * Chốt giá vật phẩm theo Giá chốt (Buy Now)
    */
   socket.on('buy_now', async ({ roomId }, callback) => {
     try {
       if (!socket.user) {
-        if (callback) callback({ success: false, message: 'Bạn cần đăng nhập để mua ngay' });
+        if (callback) callback({ success: false, message: 'Bạn cần đăng nhập để chốt giá' });
         return;
       }
 

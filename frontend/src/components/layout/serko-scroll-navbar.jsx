@@ -26,7 +26,8 @@ export function SerkoScrollNavbar({
 
   useEffect(() => {
     function handleScroll() {
-      setScrolled(window.scrollY > 24);
+      const next = window.scrollY > 24;
+      setScrolled((prev) => (prev === next ? prev : next));
     }
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -41,9 +42,9 @@ export function SerkoScrollNavbar({
   return (
     <header className="sticky top-0 z-50 w-full px-3 sm:px-6 pt-3 pb-2">
       <div
-        className={`mx-auto transition-all duration-500 ease-[cubic-bezier(0.525,0,0,1)] flex items-center justify-between gap-3 ${
+        className={`mx-auto transition-[max-width,background-color,border-color,box-shadow,padding] duration-300 ease-[cubic-bezier(0.525,0,0,1)] flex items-center justify-between gap-3 ${
           scrolled
-            ? 'max-w-[58rem] px-3 sm:px-4 py-2 rounded-2xl bg-white/80 backdrop-blur-xl border border-black/[0.07] shadow-serko-nav'
+            ? 'max-w-[58rem] px-3 sm:px-4 py-2 rounded-2xl bg-white/85 backdrop-blur-md border border-black/[0.07] shadow-serko-nav'
             : 'max-w-[78rem] px-2 sm:px-4 py-2.5 rounded-2xl bg-transparent border border-transparent'
         }`}
       >

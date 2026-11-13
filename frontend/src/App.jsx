@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import { Bell, X } from 'lucide-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider, useSocket } from './context/SocketContext';
@@ -6,12 +6,27 @@ import { apiRequest } from './config/api';
 import { SerkoScrollNavbar } from './components/layout/serko-scroll-navbar';
 import { SerkoEditorialFooter } from './components/layout/serko-editorial-footer';
 import { HomePage } from './pages/home-page';
-import { RoomDetailPage } from './pages/room-detail-page';
-import { AdminDashboardPage } from './pages/admin-dashboard-page';
-import { TermsAndPoliciesPage } from './pages/terms-and-policies-page';
 import { AuthModal } from './components/modals/auth-modal';
 import { CreateRoomModal } from './components/modals/create-room-modal';
 import { SellItemModal } from './components/modals/sell-item-modal';
+
+const RoomDetailPage = lazy(() =>
+  import('./pages/room-detail-page').then((m) => ({ default: m.RoomDetailPage }))
+);
+const AdminDashboardPage = lazy(() =>
+  import('./pages/admin-dashboard-page').then((m) => ({ default: m.AdminDashboardPage }))
+);
+const TermsAndPoliciesPage = lazy(() =>
+  import('./pages/terms-and-policies-page').then((m) => ({ default: m.TermsAndPoliciesPage }))
+);
+
+function PageLoadingFallback() {
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="rounded-[28px] bg-[#f6f6f6] h-72 animate-pulse border border-[#e9e9ec]" />
+    </div>
+  );
+}
 
 function AppContent() {
   const { user } = useAuth();
@@ -128,27 +143,31 @@ function AppContent() {
           />
         )}
 
-        {currentPage === 'room' && selectedRoomId && (
-          <RoomDetailPage
-            roomId={selectedRoomId}
-            refreshKey={roomRefreshKey}
-            onBackHome={() => handleNavigate('home')}
-            onEnterRoom={handleEnterRoom}
-            onOpenAuthModal={() => setAuthModalOpen(true)}
-            onOpenSellModal={(rid) => handleOpenSellModal(rid)}
-          />
-        )}
+        {currentPage !== 'home' && (
+          <Suspense fallback={<PageLoadingFallback />}>
+            {currentPage === 'room' && selectedRoomId && (
+              <RoomDetailPage
+                roomId={selectedRoomId}
+                refreshKey={roomRefreshKey}
+                onBackHome={() => handleNavigate('home')}
+                onEnterRoom={handleEnterRoom}
+                onOpenAuthModal={() => setAuthModalOpen(true)}
+                onOpenSellModal={(rid) => handleOpenSellModal(rid)}
+              />
+            )}
 
-        {currentPage === 'admin' && (
-          <AdminDashboardPage
-            onEnterRoom={handleEnterRoom}
-            onOpenCreateRoomModal={handleOpenCreateRoomModal}
-            onRefreshRooms={fetchRooms}
-          />
-        )}
+            {currentPage === 'admin' && (
+              <AdminDashboardPage
+                onEnterRoom={handleEnterRoom}
+                onOpenCreateRoomModal={handleOpenCreateRoomModal}
+                onRefreshRooms={fetchRooms}
+              />
+            )}
 
-        {currentPage === 'terms' && (
-          <TermsAndPoliciesPage onBackHome={() => handleNavigate('home')} />
+            {currentPage === 'terms' && (
+              <TermsAndPoliciesPage onBackHome={() => handleNavigate('home')} />
+            )}
+          </Suspense>
         )}
       </main>
 

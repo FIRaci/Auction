@@ -16,23 +16,28 @@ async function createItem(req, res) {
 
     const sellerId = req.user.id;
 
-    if (!roomId || !title || !description || startingPrice === undefined || buyNowPrice === undefined) {
+    if (!roomId || !title || !description || startingPrice === undefined) {
       return res.status(400).json({
         success: false,
-        message: 'Vui lòng điền đầy đủ: ID phòng, Tên vật phẩm, Mô tả, Giá khởi điểm và Giá mua ngay',
+        message: 'Vui lòng điền đầy đủ: ID phòng, Tên vật phẩm, Mô tả và Giá khởi điểm',
       });
     }
 
     const startPrice = parseFloat(startingPrice);
-    const buyPrice = parseFloat(buyNowPrice);
+    const hasBuyPrice =
+      buyNowPrice !== undefined &&
+      buyNowPrice !== null &&
+      String(buyNowPrice).trim() !== '' &&
+      Number(buyNowPrice) > 0;
+    const buyPrice = hasBuyPrice ? parseFloat(buyNowPrice) : null;
     const minInc = minIncrement ? parseFloat(minIncrement) : 10000;
 
     if (isNaN(startPrice) || startPrice <= 0) {
       return res.status(400).json({ success: false, message: 'Giá khởi điểm phải là một số dương hợp lệ' });
     }
 
-    if (isNaN(buyPrice) || buyPrice <= startPrice) {
-      return res.status(400).json({ success: false, message: 'Giá bán ngay phải lớn hơn giá khởi điểm' });
+    if (buyPrice !== null && (isNaN(buyPrice) || buyPrice <= startPrice)) {
+      return res.status(400).json({ success: false, message: 'Giá chốt (nếu có) phải lớn hơn giá khởi điểm' });
     }
 
     if (minInc < 10000) {

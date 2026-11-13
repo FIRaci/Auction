@@ -41,7 +41,7 @@ const LUXURY_ITEM_PRESETS = [
     category: 'Nghệ thuật & Tranh cổ',
     imageUrl: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=1000&q=85',
     startingPrice: 320000000,
-    buyNowPrice: 490000000,
+    buyNowPrice: null,
     minIncrement: 5000000,
     description:
       'Sơn mài truyền thống phủ vàng quỳ trên vóc gỗ cổ điển kích thước 80x120cm, provenance bộ sưu tập tư nhân Sài Gòn.',
@@ -55,7 +55,7 @@ export function SellItemModal({ isOpen, onClose, rooms = [], defaultRoomId = '',
   const [category, setCategory] = useState('Đồng hồ Haute Horlogerie');
   const [imageUrl, setImageUrl] = useState('');
   const [startingPrice, setStartingPrice] = useState('10000000');
-  const [buyNowPrice, setBuyNowPrice] = useState('25000000');
+  const [buyNowPrice, setBuyNowPrice] = useState('');
   const [minIncrement, setMinIncrement] = useState('100000');
   const [description, setDescription] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -79,7 +79,7 @@ export function SellItemModal({ isOpen, onClose, rooms = [], defaultRoomId = '',
     setCategory(preset.category);
     setImageUrl(preset.imageUrl);
     setStartingPrice(String(preset.startingPrice));
-    setBuyNowPrice(String(preset.buyNowPrice));
+    setBuyNowPrice(preset.buyNowPrice ? String(preset.buyNowPrice) : '');
     setMinIncrement(String(preset.minIncrement));
     setDescription(preset.description);
     setError('');
@@ -90,7 +90,8 @@ export function SellItemModal({ isOpen, onClose, rooms = [], defaultRoomId = '',
     setError('');
 
     const startNum = Number(startingPrice);
-    const buyNum = Number(buyNowPrice);
+    const hasBuyNow = String(buyNowPrice).trim() !== '' && Number(buyNowPrice) > 0;
+    const buyNum = hasBuyNow ? Number(buyNowPrice) : null;
     const stepNum = Number(minIncrement);
 
     if (!roomId) {
@@ -101,8 +102,8 @@ export function SellItemModal({ isOpen, onClose, rooms = [], defaultRoomId = '',
       setError('Bước giá tối thiểu theo quy chế phải từ 10.000 ₫ trở lên.');
       return;
     }
-    if (buyNum > 0 && buyNum <= startNum) {
-      setError('Giá mua ngay phải cao hơn giá khởi điểm.');
+    if (buyNum !== null && buyNum <= startNum) {
+      setError('Giá chốt (nếu nhập) phải cao hơn giá khởi điểm.');
       return;
     }
 
@@ -287,7 +288,7 @@ export function SellItemModal({ isOpen, onClose, rooms = [], defaultRoomId = '',
 
                   <div>
                     <label className="block text-xs font-medium text-[#4a4f59] mb-1.5">
-                      Giá mua ngay (VNĐ)
+                      Giá chốt (VNĐ · Tùy chọn)
                     </label>
                     <input
                       type="number"
@@ -295,7 +296,8 @@ export function SellItemModal({ isOpen, onClose, rooms = [], defaultRoomId = '',
                       step={10000}
                       value={buyNowPrice}
                       onChange={(e) => setBuyNowPrice(e.target.value)}
-                      className="w-full h-11 px-3.5 rounded-xl border border-[#d6d9e0] text-base font-mono text-[#17181c] focus:outline-none focus:border-[#17181c]"
+                      placeholder="Bỏ trống nếu không áp dụng"
+                      className="w-full h-11 px-3.5 rounded-xl border border-[#d6d9e0] text-base font-mono text-[#17181c] placeholder:text-xs placeholder:font-sans placeholder:text-[#8a8d96] focus:outline-none focus:border-[#17181c]"
                     />
                   </div>
                 </div>

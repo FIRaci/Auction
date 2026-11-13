@@ -54,8 +54,8 @@ const FAQ_ITEMS = [
     a: 'Sau mỗi lệnh đặt giá hợp lệ (+ tối thiểu 10.000 VNĐ), nếu suốt 3 phút không có ai trả giá cao hơn, máy chủ sẽ phát thông báo 3 lần liên tiếp (mỗi lần cách nhau 30 giây). Kết thúc 3 lần mà không có giá mới, người trả cao nhất trúng đấu giá.',
   },
   {
-    q: 'Mua Ngay (Buy Now) có hủy đấu giá ngay lập tức không?',
-    a: 'Có. Khi một thành viên xác nhận Mua Ngay theo giá niêm yết, vật phẩm lập tức chuyển sang trạng thái SOLD cho người mua đó, hủy mọi bộ đếm hiện tại và tự động kích hoạt vật phẩm kế tiếp trong hàng đợi FIFO.',
+    q: 'Giá chốt (tùy chọn) có hủy đấu giá ngay lập tức không?',
+    a: 'Có. Nếu người ký gửi có thiết lập Giá chốt và một thành viên xác nhận Chốt giá ngay, vật phẩm lập tức chuyển sang trạng thái SOLD cho người mua đó, hủy mọi bộ đếm hiện tại và tự động kích hoạt vật phẩm kế tiếp trong hàng đợi FIFO.',
   },
   {
     q: 'Admin có những quyền điều phối nào trong phiên?',
@@ -87,7 +87,7 @@ export function SerkoFeatureSections({ activeLiveRoom, onEnterRoom, onNavigate }
                 <span className="serko-accent-text">đấu giá viên riêng.</span>
               </h2>
               <p className="text-base text-[#4b4f57] leading-relaxed">
-                Mọi lệnh đặt giá, khóa phòng duy nhất và giao dịch Mua Ngay đều được kiểm chứng tức thì qua WebSocket, loại bỏ độ trễ và sai số thủ công.
+                Mọi lệnh đặt giá, khóa phòng duy nhất và giao dịch theo Giá chốt đều được kiểm chứng tức thì qua WebSocket, loại bỏ độ trễ và sai số thủ công.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
@@ -108,10 +108,10 @@ export function SerkoFeatureSections({ activeLiveRoom, onEnterRoom, onNavigate }
                     <HoverBoltZapIcon className="w-5 h-5" />
                   </div>
                   <h3 className="text-sm font-bold text-[#17181c] mb-1">
-                    Mua Ngay Tức Thì
+                    Giá Chốt Tức Thì (Tùy Chọn)
                   </h3>
                   <p className="text-xs text-[#4b4f57] leading-relaxed">
-                    Chốt sở hữu ngay ở giá niêm yết và xoay vòng sang lô tiếp theo trong hàng đợi FIFO.
+                    Nếu có thiết lập Giá chốt, người mua có thể chốt sở hữu ngay và xoay vòng sang lô FIFO tiếp theo.
                   </p>
                 </div>
               </div>

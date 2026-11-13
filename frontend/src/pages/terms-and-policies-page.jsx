@@ -46,8 +46,8 @@ const CHAPTERS = [
       },
       {
         code: 'Điều 6',
-        heading: 'Bước giá tối thiểu & Giá mua ngay',
-        body: 'Bước giá tối thiểu bắt buộc từ 10.000 VNĐ trở lên trên mỗi lần trả. Người ký gửi có thể thiết lập mức Giá mua ngay (Buy Now) cao hơn giá khởi điểm để người mua chốt sở hữu tức thì.',
+        heading: 'Bước giá tối thiểu & Giá chốt (tùy chọn)',
+        body: 'Bước giá tối thiểu bắt buộc từ 10.000 VNĐ trở lên trên mỗi lần trả. Người ký gửi có thể thiết lập thêm mức Giá chốt (tùy chọn, cao hơn giá khởi điểm) hoặc bỏ trống để người tham gia tự do cạnh tranh đến khi gõ búa.',
       },
     ],
   },
@@ -69,12 +69,12 @@ const CHAPTERS = [
   },
   {
     id: 'chuong-5',
-    title: 'Chương V. Mua ngay (Buy Now), Thanh toán & Quyền lợi',
+    title: 'Chương V. Chốt giá ngay (Giá chốt tùy chọn), Thanh toán & Quyền lợi',
     articles: [
       {
         code: 'Điều 9',
-        heading: 'Hiệu lực Mua ngay tức thì',
-        body: 'Khi hội viên bấm "Mua ngay" trên vật phẩm đang mở đấu, phiên đấu lô hàng đó kết thúc ngay lập tức bất kể trạng thái đếm ngược, quyền sở hữu tạm xác lập cho người Mua ngay và hàng đợi chuyển sang lô kế tiếp.',
+        heading: 'Hiệu lực Chốt giá tức thì',
+        body: 'Với các vật phẩm có thiết lập Giá chốt, khi hội viên bấm "Chốt giá ngay", phiên đấu lô hàng đó kết thúc ngay lập tức bất kể trạng thái đếm ngược, quyền sở hữu tạm xác lập cho người chốt giá và hàng đợi chuyển sang lô kế tiếp.',
       },
       {
         code: 'Điều 10',

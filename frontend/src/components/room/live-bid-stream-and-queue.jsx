@@ -25,7 +25,7 @@ const ITEM_STATUS_LABEL = {
   UNSOLD: { text: 'Chưa bán', cls: 'bg-[#f6f6f6] text-[#666b75]' },
 };
 
-export function LiveBidStreamAndQueue({
+export const LiveBidStreamAndQueue = React.memo(function LiveBidStreamAndQueue({
   bids = [],
   eventLogs = [],
   participants = [],
@@ -275,5 +275,5 @@ export function LiveBidStreamAndQueue({
       </div>
     </div>
   );
-}
+});
 

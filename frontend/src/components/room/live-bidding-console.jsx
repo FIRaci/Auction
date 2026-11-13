@@ -149,9 +149,9 @@ export function LiveBiddingConsole({
                   </p>
                 </div>
                 <div className="rounded-xl bg-[#e8f3fe]/70 p-3 border border-[#d0e5fc]">
-                  <p className="text-[11px] uppercase tracking-wider text-[#004680] font-medium">Mua ngay</p>
+                  <p className="text-[11px] uppercase tracking-wider text-[#004680] font-medium">Giá chốt</p>
                   <p className="font-mono text-xs sm:text-sm font-semibold text-[#001c38] mt-1 tabular-nums">
-                    {activeItem.buyNowPrice ? formatVND(activeItem.buyNowPrice) : 'Không áp dụng'}
+                    {activeItem.buyNowPrice > 0 ? formatVND(activeItem.buyNowPrice) : 'Không áp dụng'}
                   </p>
                 </div>
               </div>
@@ -197,7 +197,7 @@ export function LiveBiddingConsole({
             {!user ? (
               <div className="rounded-2xl bg-[#f6f6f6] border border-[#e5e7eb] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="text-sm text-[#4a4f59]">
-                  Đăng nhập tài khoản thành viên để đặt giá trực tiếp hoặc mua ngay vật phẩm này.
+                  Đăng nhập tài khoản thành viên để đặt giá trực tiếp hoặc chốt giá vật phẩm này.
                 </div>
                 <button
                   type="button"
@@ -272,7 +272,7 @@ export function LiveBiddingConsole({
                       className="serko-btn-iridescent h-12 px-5 inline-flex items-center justify-center gap-1.5 text-sm font-semibold shrink-0 disabled:opacity-50"
                     >
                       <HoverBoltZapIcon className="w-4 h-4" />
-                      {buyingNow ? 'Đang chốt...' : 'Mua ngay'}
+                      {buyingNow ? 'Đang chốt...' : 'Chốt giá ngay'}
                     </button>
                   )}
                 </form>
@@ -282,7 +282,7 @@ export function LiveBiddingConsole({
                   Mức đặt hợp lệ tiếp theo từ{' '}
                   <strong className="font-mono text-[#17181c]">{formatVND(minValidBid)}</strong>
                   {activeItem.buyNowPrice > 0 && (
-                    <span> · Hoặc chốt ngay với <strong className="font-mono text-[#17181c]">{formatVND(activeItem.buyNowPrice)}</strong></span>
+                    <span> · Hoặc chốt ngay ở Giá chốt <strong className="font-mono text-[#17181c]">{formatVND(activeItem.buyNowPrice)}</strong></span>
                   )}
                 </p>
               </div>

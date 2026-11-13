@@ -16,3 +16,4 @@ services:
         generateValue: true
       - key: DEMO_FAST_FORWARD
         value: "false"
+

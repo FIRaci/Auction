@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 
 const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-function OdometerDigit({ digit }) {
+const OdometerDigit = React.memo(function OdometerDigit({ digit }) {
   const num = parseInt(digit, 10);
   if (isNaN(num)) {
     return (
@@ -32,12 +32,17 @@ function OdometerDigit({ digit }) {
       </motion.span>
     </span>
   );
-}
+});
 
 /**
  * Vertical spring-physics digit odometer for live prices and counters.
  */
-export function KineticOdometer({ value, text, children, className = '' }) {
+export const KineticOdometer = React.memo(function KineticOdometer({
+  value,
+  text,
+  children,
+  className = '',
+}) {
   const rawValue = value ?? text ?? children ?? '';
   const str = String(rawValue);
 
@@ -54,7 +59,7 @@ export function KineticOdometer({ value, text, children, className = '' }) {
       })}
     </span>
   );
-}
+});
 
 export const RollingNumber = KineticOdometer;
 export default KineticOdometer;
