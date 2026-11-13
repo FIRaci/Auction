@@ -25,7 +25,7 @@ export function SerkoHeroSection({ activeLiveRoom, spotItem, onEnterRoom, onNavi
   return (
     <section className="serko-hero-gradient relative overflow-hidden pt-10 sm:pt-14 pb-0">
       {/* Interactive 3D Dotted Globe Background */}
-      <div className="absolute inset-x-0 top-36 sm:top-28 h-[540px] sm:h-[640px] pointer-events-none opacity-80">
+      <div className="absolute inset-x-0 top-[220px] sm:top-[240px] h-[560px] sm:h-[640px] pointer-events-none opacity-85 [mask-image:radial-gradient(ellipse_80%_75%_at_50%_55%,#000_60%,transparent_100%)]">
         <SerkoGlobeCanvas />
       </div>
 
