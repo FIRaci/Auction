@@ -1,0 +1,18 @@
+{
+  "name": "royal-auction",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RoyalAuction — Real-Time Luxury Auction Platform (React + Express + Socket.IO + Prisma)",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "render:build": "npm --prefix frontend install --include=dev && npm --prefix frontend run build && npm --prefix backend install --include=dev && npm --prefix backend run prisma:generate",
+    "render:start": "npm --prefix backend run start:prod",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "seed": "npm --prefix backend run seed",
+    "test:e2e": "node scripts/test-e2e.js"
+  }
+}

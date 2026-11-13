@@ -1,0 +1,111 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  phone        String?
+  role         String   @default("MEMBER") // "ADMIN", "MEMBER"
+  balance      Float    @default(100000000)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  createdRooms Room[]            @relation("RoomCreator")
+  sellingItems Item[]            @relation("ItemSeller")
+  wonItems     Item[]            @relation("ItemWinner")
+  bids         Bid[]
+  participant  RoomParticipant?
+}
+
+model Room {
+  id            Int      @id @default(autoincrement())
+  title         String
+  description   String?
+  code          String   @unique
+  status        String   @default("UPCOMING") // "UPCOMING", "LIVE", "ENDED"
+  createdById   Int
+  creator       User     @relation("RoomCreator", fields: [createdById], references: [id])
+  currentItemId Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  items        Item[]
+  participants RoomParticipant[]
+  eventLogs    AuctionEventLog[]
+}
+
+model Item {
+  id           Int       @id @default(autoincrement())
+  roomId       Int
+  room         Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  title        String
+  description  String
+  category     String    @default("Art & Collectibles")
+  imageUrl     String?
+  startingPrice Float
+  buyNowPrice  Float
+  currentPrice Float
+  minIncrement Float     @default(10000)
+  status       String    @default("WAITING") // "WAITING", "BIDDING", "SOLD", "UNSOLD"
+  queueOrder   Int       @default(0)
+  sellerId     Int
+  seller       User      @relation("ItemSeller", fields: [sellerId], references: [id])
+  winnerId     Int?
+  winner       User?     @relation("ItemWinner", fields: [winnerId], references: [id])
+  soldAt       DateTime?
+  soldPrice    Float?
+  soldType     String?   // "AUCTION", "BUY_NOW"
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  bids      Bid[]
+  eventLogs AuctionEventLog[]
+}
+
+model Bid {
+  id        Int      @id @default(autoincrement())
+  itemId    Int
+  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  bidderId  Int
+  bidder    User     @relation(fields: [bidderId], references: [id])
+  amount    Float
+  createdAt DateTime @default(now())
+}
+
+model RoomParticipant {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roomId    Int
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  socketId  String?
+  joinedAt  DateTime @default(now())
+}
+
+model AuctionEventLog {
+  id        Int      @id @default(autoincrement())
+  roomId    Int
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  itemId    Int?
+  item      Item?    @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  eventType String
+  message   String
+  details   String?
+  createdAt DateTime @default(now())
+}
+
+model SystemSetting {
+  key         String   @id
+  value       String
+  description String?
+  updatedAt   DateTime @default(now())
+}
+

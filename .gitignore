@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Build outputs
+dist/
+*/dist/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+*/.env
+*/.env.*
+!*/.env.example
+
+# SQLite databases & logs
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.log
+
+# Playwright & test artifacts
+.playwright-mcp/
+test-results/
+playwright-report/
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
